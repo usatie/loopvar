@@ -49,5 +49,16 @@ func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
 }
 
 func findPointerOfLoopVar(pass *analysis.Pass, assignStmt *ast.AssignStmt) {
+	if len(assignStmt.Lhs) == 0 {
+		return
+	}
 
+	ident, ok := assignStmt.Lhs[0].(*ast.Ident)
+	if !ok {
+		return
+	}
+
+	if assignStmt == ident.Obj.Decl {
+		pass.Reportf(assignStmt.Pos(), "")
+	}
 }
