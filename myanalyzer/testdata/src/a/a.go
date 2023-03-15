@@ -4,17 +4,17 @@ import "fmt"
 
 // for 文を見つける
 func findFor() {
-	for findForVar := 0; findForVar < 3; findForVar++ {
-		fmt.Println(findForVar) // want "for found"
+	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
+		fmt.Println(findForVar)
 	}
 }
 
 func pointer() {
-	for findForVar := 0; findForVar < 3; findForVar++ {
+	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
 		fmt.Println(&findForVar) // want "and used in for"
 	}
 
-	for findForVar := 0; findForVar < 3; findForVar++ {
+	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
 		fmt.Println(findForVar) // OK
 	}
 }

@@ -1,6 +1,7 @@
 package myanalyzer
 
 import (
+	"fmt"
 	"go/ast"
 
 	"golang.org/x/tools/go/analysis"
@@ -31,8 +32,17 @@ func run(pass *analysis.Pass) (any, error) {
 		switch n := n.(type) {
 		case *ast.ForStmt:
 			pass.Reportf(n.Pos(), "for found")
+			findLoopVar(pass, n)
 		}
 	})
 
 	return nil, nil
+}
+
+func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
+	assignStmt, ok := forstmt.Init.(*ast.AssignStmt)
+	if !ok {
+		return
+	}
+	fmt.Println(assignStmt)
 }
