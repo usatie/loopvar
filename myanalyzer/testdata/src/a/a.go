@@ -2,7 +2,22 @@ package a
 
 import "fmt"
 
-func notogawa() {
+func testFindPointerOfLoopVar() {
+	/*
+		{
+			for foo := 0 ; foo < 3 ; foo++ {
+				bar := &foo
+				f(foo) // OK
+				g(&foo) // NG
+
+				f(*bar) // OK
+				g(bar) // NG
+
+				bar = nil
+				g(bar) // OK
+			}
+		}
+	*/
 	{
 		foo := 0
 		for foo := foo; foo < 3; foo++ { // want "foo found"
