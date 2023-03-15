@@ -2,7 +2,6 @@ package myanalyzer
 
 import (
 	"go/ast"
-
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
@@ -69,16 +68,23 @@ func findPointerOfLoopVar(pass *analysis.Pass, decl *ast.AssignStmt, body *ast.B
 		}
 
 		switch n := n.(type) {
-		// &i を検出
 		case *ast.UnaryExpr:
-			_, ok := n.X.(*ast.Ident)
+			// & じゃなかったら返す
+			//if n.Op != token.AND {
+			//	return true
+			//}
+
+			// x -> &の引数
+			x, ok := n.X.(*ast.Ident)
 			if !ok {
 				return true
 			}
-			pass.Reportf(n.Pos(), "unary expr found")
-		}
 
+			// xが宣言されている場所が、ループ変数と一致するときレポート
+			if x.Obj.Decl == decl {
+				pass.Reportf(n.Pos(), "unary expr found")
+			}
+		}
 		return true
 	})
-
 }

@@ -18,9 +18,12 @@ func notogawa() {
 		for foo := foo; foo < 3; foo++ { // want "foo found"
 			fmt.Println(&foo) // want "unary expr found"
 		}
+		for foo := &foo; *foo < 3; *foo++ { // want "foo found"
+			fmt.Println(*foo) // TODO: これも通る
+		}
 		for foo := foo; foo < 3; foo++ { // want "foo found"
 			foo := foo
-			fmt.Println(&foo) // 次はここから
+			fmt.Println(&foo)
 		}
 	}
 	{
