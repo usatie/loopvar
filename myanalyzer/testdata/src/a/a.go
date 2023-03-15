@@ -16,7 +16,7 @@ func notogawa() {
 			fmt.Println(foo)
 		}
 		for foo := foo; foo < 3; foo++ { // want "foo found"
-			fmt.Println(&foo)
+			fmt.Println(&foo) // want "pointer of loop var found"
 		}
 		for foo := foo; foo < 3; foo++ { // want "foo found"
 			foo := foo

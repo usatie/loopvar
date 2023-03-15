@@ -1,6 +1,7 @@
 package myanalyzer
 
 import (
+	"fmt"
 	"go/ast"
 
 	"golang.org/x/tools/go/analysis"
@@ -44,10 +45,6 @@ func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
 		return
 	}
 
-	findPointerOfLoopVar(pass, assignStmt)
-}
-
-func findPointerOfLoopVar(pass *analysis.Pass, assignStmt *ast.AssignStmt) {
 	if len(assignStmt.Lhs) == 0 {
 		return
 	}
@@ -57,7 +54,16 @@ func findPointerOfLoopVar(pass *analysis.Pass, assignStmt *ast.AssignStmt) {
 		return
 	}
 
-	if assignStmt == ident.Obj.Decl {
-		pass.Reportf(assignStmt.Pos(), "%v found", ident)
+	if assignStmt != ident.Obj.Decl {
+		return
 	}
+	pass.Reportf(assignStmt.Pos(), "%v found", ident)
+
+	findPointerOfLoopVar(pass, assignStmt, forstmt.Body)
+}
+
+
+func findPointerOfLoopVar(pass *analysis.Pass, decl *ast.AssignStmt, body *ast.BlockStmt) {
+	fmt.Println(decl)
+	fmt.Println(body)
 }
