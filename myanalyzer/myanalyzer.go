@@ -2,6 +2,8 @@ package myanalyzer
 
 import (
 	"go/ast"
+	"go/types"
+
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
@@ -57,10 +59,14 @@ func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
 	}
 	pass.Reportf(assignStmt.Pos(), "%v found", ident)
 
-	findPointerOfLoopVar(pass, assignStmt, forstmt.Body)
+	forStmtScope, ok := pass.TypesInfo.Scopes[forstmt]
+	if !ok {
+		return
+	}
+	findPointerOfLoopVar(pass, forStmtScope, forstmt.Body)
 }
 
-func findPointerOfLoopVar(pass *analysis.Pass, decl *ast.AssignStmt, body *ast.BlockStmt) {
+func findPointerOfLoopVar(pass *analysis.Pass, forstmtScope *types.Scope, body *ast.BlockStmt) {
 
 	ast.Inspect(body, func(n ast.Node) bool {
 		if n == nil {
@@ -75,13 +81,18 @@ func findPointerOfLoopVar(pass *analysis.Pass, decl *ast.AssignStmt, body *ast.B
 			//}
 
 			// x -> &の引数
-			x, ok := n.X.(*ast.Ident)
+			// x, ok := n.X.(*ast.Ident)
+			// if !ok {
+			// 	return false
+			// }
+
+			xScope, ok := pass.TypesInfo.Scopes[n]
 			if !ok {
-				return true
+				return false
 			}
 
 			// xが宣言されている場所が、ループ変数と一致するときレポート
-			if x.Obj.Decl == decl {
+			if xScope.Parent() == forstmtScope {
 				pass.Reportf(n.Pos(), "unary expr found")
 			}
 		}
