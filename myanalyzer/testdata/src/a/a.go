@@ -1,7 +1,12 @@
 package a
 
-func f() {
-	// The pattern can be written in regular expression.
-	var gopher int // want "pattern"
-	print(gopher)  // want "identifier is gopher"
+import "fmt"
+
+// for 文を見つける
+func findFor() {
+	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
+		fmt.Println(findForVar)
+	}
 }
+
+//
