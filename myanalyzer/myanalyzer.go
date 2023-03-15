@@ -1,7 +1,6 @@
 package myanalyzer
 
 import (
-	"fmt"
 	"go/ast"
 
 	"golang.org/x/tools/go/analysis"
@@ -31,7 +30,7 @@ func run(pass *analysis.Pass) (any, error) {
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
 		switch n := n.(type) {
 		case *ast.ForStmt:
-			pass.Reportf(n.Pos(), "for found")
+			// pass.Reportf(n.Pos(), "for found")
 			findLoopVar(pass, n)
 		}
 	})
@@ -44,5 +43,11 @@ func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
 	if !ok {
 		return
 	}
-	fmt.Println(assignStmt)
+	pass.Reportf(forstmt.Pos(), "for found")
+
+	findPointerOfLoopVar(pass, assignStmt)
+}
+
+func findPointerOfLoopVar(pass *analysis.Pass, assignStmt *ast.AssignStmt) {
+
 }

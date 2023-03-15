@@ -7,6 +7,9 @@ func findFor() {
 	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
 		fmt.Println(findForVar)
 	}
+	for { // OK
+		break
+	}
 }
 
 func pointer() {
