@@ -16,11 +16,11 @@ func notogawa() {
 			fmt.Println(foo)
 		}
 		for foo := foo; foo < 3; foo++ { // want "foo found"
-			fmt.Println(&foo) // want "pointer of loop var found"
+			fmt.Println(&foo) // want "unary expr found"
 		}
 		for foo := foo; foo < 3; foo++ { // want "foo found"
 			foo := foo
-			fmt.Println(&foo)
+			fmt.Println(&foo) // 次はここから
 		}
 	}
 	{

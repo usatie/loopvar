@@ -1,7 +1,6 @@
 package myanalyzer
 
 import (
-	"fmt"
 	"go/ast"
 
 	"golang.org/x/tools/go/analysis"
@@ -62,8 +61,24 @@ func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
 	findPointerOfLoopVar(pass, assignStmt, forstmt.Body)
 }
 
-
 func findPointerOfLoopVar(pass *analysis.Pass, decl *ast.AssignStmt, body *ast.BlockStmt) {
-	fmt.Println(decl)
-	fmt.Println(body)
+
+	ast.Inspect(body, func(n ast.Node) bool {
+		if n == nil {
+			return false
+		}
+
+		switch n := n.(type) {
+		// &i を検出
+		case *ast.UnaryExpr:
+			_, ok := n.X.(*ast.Ident)
+			if !ok {
+				return true
+			}
+			pass.Reportf(n.Pos(), "unary expr found")
+		}
+
+		return true
+	})
+
 }
