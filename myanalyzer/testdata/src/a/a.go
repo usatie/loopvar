@@ -34,7 +34,13 @@ func testFindPointerOfLoopVar() {
 			fmt.Println(&foo) // want "unary expr found"
 		}
 		for foo := &foo; *foo < 3; *foo++ { // want "foo found"
-			fmt.Println(*foo) // TODO: これも通る
+			fmt.Println(*foo)
+		}
+		for foo := foo; foo < 3; foo++ { // want "foo found"
+			_ = &foo
+			foo = -foo
+			foo = +foo
+			foo--
 		}
 		for foo := foo; foo < 3; foo++ { // want "foo found"
 			foo := foo

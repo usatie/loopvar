@@ -2,6 +2,7 @@ package myanalyzer
 
 import (
 	"go/ast"
+	"go/token"
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
@@ -54,15 +55,17 @@ func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
 		return
 	}
 
-	if assignStmt != ident.Obj.Decl {
-		return
-	}
-	pass.Reportf(assignStmt.Pos(), "%v found", ident)
-
 	forStmtScope, ok := pass.TypesInfo.Scopes[forstmt]
 	if !ok {
 		return
 	}
+
+	obj := pass.TypesInfo.ObjectOf(ident)
+	if obj.Parent() != forStmtScope {
+		return
+	}
+	pass.Reportf(assignStmt.Pos(), "%v found", ident)
+
 	findPointerOfLoopVar(pass, forStmtScope, forstmt.Body)
 }
 
@@ -72,30 +75,42 @@ func findPointerOfLoopVar(pass *analysis.Pass, forstmtScope *types.Scope, body *
 		if n == nil {
 			return false
 		}
-
 		switch n := n.(type) {
-		case *ast.UnaryExpr:
-			// & じゃなかったら返す
-			//if n.Op != token.AND {
-			//	return true
-			//}
-
-			// x -> &の引数
-			// x, ok := n.X.(*ast.Ident)
-			// if !ok {
-			// 	return false
-			// }
-
-			xScope, ok := pass.TypesInfo.Scopes[n]
-			if !ok {
-				return false
-			}
-
-			// xが宣言されている場所が、ループ変数と一致するときレポート
-			if xScope.Parent() == forstmtScope {
-				pass.Reportf(n.Pos(), "unary expr found")
-			}
+		case *ast.CallExpr:
+			findPointerOfLoopVarInExpressions(pass, forstmtScope, []ast.Expr{n})
 		}
 		return true
 	})
+}
+
+func findPointerOfLoopVarInExpressions(pass *analysis.Pass, forstmtScope *types.Scope, args []ast.Expr) {
+	for _, arg := range args {
+		ast.Inspect(arg, func(n ast.Node) bool {
+			if n == nil {
+				return false
+			}
+
+			switch n := n.(type) {
+			case *ast.UnaryExpr:
+				// & じゃなかったら返す
+				if n.Op != token.AND {
+					return true
+				}
+
+				// ident -> &の引数
+				ident, ok := n.X.(*ast.Ident)
+				if !ok {
+					return true
+				}
+
+				obj := pass.TypesInfo.ObjectOf(ident)
+
+				// xが宣言されている場所が、ループ変数と一致するときレポート
+				if obj.Parent() == forstmtScope {
+					pass.Reportf(n.Pos(), "unary expr found")
+				}
+			}
+			return true
+		})
+	}
 }
