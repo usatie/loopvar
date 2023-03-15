@@ -2,22 +2,49 @@ package a
 
 import "fmt"
 
-// for 文を見つける
-func findFor() {
-	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
-		fmt.Println(findForVar)
+func notogawa() {
+	{
+		foo := 0
+		for foo := foo; foo < 3; foo++ { // want "foo found"
+			fmt.Println(foo)
+		}
+		for foo := foo; foo < 3; foo++ { // want "foo found"
+			fmt.Println(foo)
+		}
+		for foo := foo; foo < 3; foo++ { // want "foo found"
+			foo := foo
+			fmt.Println(foo)
+		}
+		for foo := foo; foo < 3; foo++ { // want "foo found"
+			fmt.Println(&foo)
+		}
+		for foo := foo; foo < 3; foo++ { // want "foo found"
+			foo := foo
+			fmt.Println(&foo)
+		}
 	}
-	for { // OK
-		break
-	}
-}
-
-func pointer() {
-	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
-		fmt.Println(&findForVar) // want "and used in for"
-	}
-
-	for findForVar := 0; findForVar < 3; findForVar++ { // want "for found"
-		fmt.Println(findForVar) // OK
+	{
+		foo := 0
+		for ; foo < 3; foo++ {
+			fmt.Println(foo)
+		}
+		foo = 0
+		for ; foo < 3; foo++ {
+			fmt.Println(foo)
+		}
+		foo = 0
+		for ; foo < 3; foo++ {
+			foo := foo
+			fmt.Println(foo)
+		}
+		foo = 0
+		for ; foo < 3; foo++ {
+			fmt.Println(&foo)
+		}
+		foo = 0
+		for ; foo < 3; foo++ {
+			foo := foo
+			fmt.Println(&foo)
+		}
 	}
 }

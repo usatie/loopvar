@@ -43,7 +43,6 @@ func findLoopVar(pass *analysis.Pass, forstmt *ast.ForStmt) {
 	if !ok {
 		return
 	}
-	pass.Reportf(forstmt.Pos(), "for found")
 
 	findPointerOfLoopVar(pass, assignStmt)
 }
@@ -59,6 +58,6 @@ func findPointerOfLoopVar(pass *analysis.Pass, assignStmt *ast.AssignStmt) {
 	}
 
 	if assignStmt == ident.Obj.Decl {
-		pass.Reportf(assignStmt.Pos(), "")
+		pass.Reportf(assignStmt.Pos(), "%v found", ident)
 	}
 }
